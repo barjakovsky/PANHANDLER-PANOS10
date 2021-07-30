@@ -49,6 +49,7 @@ snippets:
   - name: check_allow_security_policies_have_profile
     label: check that all allow security policies have a Log Forwarding ALERT
     test: security_policies_with_Log_Forwarding_ALERT | length == 0
+    test: security_policies_with_Log_Forwarding | length == 0
     severity: medium
     fail_message: |
       Security policies without Log Forwarding ALERT: {{ security_policies_with_Log_Forwarding_ALERT }}
