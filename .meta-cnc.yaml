@@ -1,61 +1,46 @@
-# skillet preamble information used by panhandler
-# ---------------------------------------------------------------------
-# unique snippet name
-name: BASIC SECURITY BASELINE
-# label used for menu selection
-label: LOG FORWARDING
-description: BASIC SECURITY BASELINE
+name: LOG FORWARDING
+label: AUDIT
 
-# type of device configuration
-# common types are panorama, panos, and template
-# https://github.com/PaloAltoNetworks/panhandler/blob/develop/docs/metadata_configuration.rst
-type: panos
-# preload static or default-based templates
-extends:
-
-# grouping of like snippets for dynamic menu creation in panhandler
+type: pan_validation
 labels:
   collection:
-    - CYBERSECURITY
+    - Skillet Builder
+    - Validation
 
-# ---------------------------------------------------------------------
-# end of preamble section
-
-# variables section
-# ---------------------------------------------------------------------
-# variables used in the configuration templates
-# type_hint defines the form field used by panhandler
-# type_hints can be text, ip_address, or dropdown
 variables:
-  - name: hostname
-    description: Firewall hostname
-    default: Firewall Name
-    type_hint: text
-# ---------------------------------------------------------------------
-# end of variables section
 
-# snippets section
-# ---------------------------------------------------------------------
-# snippets used for api configuration including xpath and element as file name
-# files will load in the order listed
-# NOTE: The following snippets are auto-generated and ordered automatically.
-# Changing the content of the snippet may be necessary, but do NOT change the order
+  - name: placeholder
+    description: Some Parameter
+    default: yes
+    type_hint: hidden
 
-# There is a variable called snippets that we can use to auto-generate this section for us
 snippets:
 
-  - name: tcp-retransmit-scan-342041
-    xpath: /config/devices/entry[@name="localhost.localdomain"]/deviceconfig/setting/session
-    element: |-
-        yes
+  # test that all allow security policies have a profile or profile-group configured
+  - name: security_policy_test
+    cmd: parse
+    variable: config
+    outputs:
+      # get a list of security policies with a profile or group configured
+      - name: security_policies_with_profile_or_group
+        capture_list: |-
+          /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry/profile-setting/../@name
 
-  - name: tcp-942882
-    xpath: /config/devices/entry[@name="localhost.localdomain"]/deviceconfig/setting
-    element: |-
-        
-                    clear
-                  
+      # get a list of security policies with action allow
+      - name: allow_security_policies_without_profile
+        capture_list: |-
+          /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry/action[text()='allow']/../@name
+        filter_items: item not in security_policies_with_profile_or_group
 
-
-# ---------------------------------------------------------------------
-# end of snippets section
+  # check that all allow security policies have a profile or group
+  - name: check_allow_security_policies_have_profile
+    label: check that all allow security policies have a profile or group
+    test: allow_security_policies_without_profile | length == 0
+    severity: medium
+    fail_message: |
+      allow security policies without a profile or group: {{ allow_security_policies_without_profile }}
+    pass_message: |
+      all allow security policies have a profile or group configured
+    documentation_link: https://docs.paloaltonetworks.com/pan-os/9-1/pan-os-admin/policy/security-profiles/create-a-security-profile-group.html
