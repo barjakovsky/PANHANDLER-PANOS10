@@ -34,7 +34,16 @@ snippets:
         capture_list: |-
           /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
           /rulebase/security/rules/entry/log-setting[text()='ALERT']/../@name
-        #filter_items: item not in security_policies_Log_Forwarding
+        filter_items: item not in security_policies_Log_Forwarding
+
+      # get a list of security policies without Log Forwarding
+      - name: security_policies_with_Log_Forwarding
+        capture_list: |-
+          /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry/log-setting[attribute_absent()]/../@name
+        filter_items: item not in security_policies_Log_Forwarding
+
+
 
   # check that all allow security policies have a Log Forwarding ALERT
   - name: check_allow_security_policies_have_profile
@@ -43,5 +52,6 @@ snippets:
     severity: medium
     fail_message: |
       Security policies without Log Forwarding ALERT: {{ security_policies_with_Log_Forwarding_ALERT }}
+      Security policies without Log Forwarding: {{ security_policies_with_Log_Forwarding }}
     pass_message: |
       All security policies have a Log Forwarding ALERT
