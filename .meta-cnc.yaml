@@ -17,30 +17,30 @@ variables:
     type_hint: hidden
 
 snippets:
-# test that all security policies have log forwarding configured
- - name: security_policy_test
-   cmd: parse
-   variable: config
-   outputs:
-     # get a list of security policies with a log forwarding configured
-     - name: security_policies_with_log_forwarding
-       capture_list: |-
-         /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
-         /rulebase/security/rules/entry/log-setting/../@name
+  # test that all allow security policies have a profile or profile-group configured
+  - name: security_policy_test
+    cmd: parse
+    variable: config
+    outputs:
+      # get a list of security policies with a profile or group configured
+      - name: security_policies_with_profile_or_group
+        capture_list: |-
+          /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry/log-setting/../@name
 
-     # get a list of security policies without Log Forwarding PANORAMA
-     - name: log_forwarding_security_policies_without_PANORAMA_profile
-       capture_list: |-
-         /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
-         /rulebase/security/rules/entry/log-setting[text()='PANORAMA']/../@name
-       filter_items: item not in log_forwarding_security_policies_without_PANORAMA_profile
-       
-# check that all allow security policies have a Log Forwarding PANORAMA
-  - name: security_policies_have_profile_log_forwarding_PANORAMA
-    label: check that all security policies have a log forwarding PANORAMA
-    test: security_policies_with_log_forwarding | length == 0
+      # get a list of security policies with action allow
+      - name: allow_security_policies_without_profile
+        capture_list: |-
+          /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry/log-setting[text()='PANORAMA']/../@name
+        filter_items: item not in security_policies_with_profile_or_group
+
+  # check that all allow security policies have a profile or group
+  - name: check_allow_security_policies_have_profile
+    label: check that all allow security policies have a profile or group
+    test: allow_security_policies_without_profile | length == 0
     severity: medium
     fail_message: |
-      security policies without log forwarding PANORAMA: {{ log_forwarding_security_policies_without_PANORAMA_profile }}
+      allow security policies without a profile or group: {{ allow_security_policies_without_profile }}
     pass_message: |
-      all security policies have a log forwarding PANORAMA
+      all allow security policies have a profile or group configured
