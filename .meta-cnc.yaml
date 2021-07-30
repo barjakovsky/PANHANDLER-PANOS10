@@ -1,11 +1,13 @@
 name: LOG FORWARDING
 label: AUDIT
 
+description: |-
+ Verify that rules have a LOG FORWARDING configured
+
 type: pan_validation
 labels:
   collection:
-    - Skillet Builder
-    - Validation
+    - CYBERSECURITY
 
 variables:
 
