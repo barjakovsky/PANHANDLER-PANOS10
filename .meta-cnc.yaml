@@ -24,25 +24,24 @@ snippets:
     variable: config
     outputs:
       # get a list of security policies with a profile or group configured
-      - name: security_policies_with_profile_or_group
+      - name: security_policies_Log_Forwarding
         capture_list: |-
           /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
-          /rulebase/security/rules/entry/profile-setting/../@name
+          /rulebase/security/rules/entry/log-setting/../@name
 
       # get a list of security policies with action allow
-      - name: allow_security_policies_without_profile
+      - name: security_policies_with_Log_Forwarding_ALERT
         capture_list: |-
           /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
-          /rulebase/security/rules/entry/action[text()='allow']/../@name
-        filter_items: item not in security_policies_with_profile_or_group
+          /rulebase/security/rules/entry/log-setting[text()='ALERT']/../@name
+        filter_items: item not in security_policies_Log_Forwarding
 
-  # check that all allow security policies have a profile or group
+  # check that all allow security policies have a Log Forwarding ALERT
   - name: check_allow_security_policies_have_profile
-    label: check that all allow security policies have a profile or group
-    test: allow_security_policies_without_profile | length == 0
+    label: check that all allow security policies have a Log Forwarding ALERT
+    test: security_policies_with_Log_Forwarding_ALERT | length == 0
     severity: medium
     fail_message: |
-      allow security policies without a profile or group: {{ allow_security_policies_without_profile }}
+      Security policies without Log Forwarding ALERT: {{ security_policies_with_Log_Forwarding_ALERT }}
     pass_message: |
-      all allow security policies have a profile or group configured
-    documentation_link: https://docs.paloaltonetworks.com/pan-os/9-1/pan-os-admin/policy/security-profiles/create-a-security-profile-group.html
+      All security policies have a Log Forwarding ALERT
