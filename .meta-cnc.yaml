@@ -1,9 +1,9 @@
 # skillet preamble information used by panhandler
 # ---------------------------------------------------------------------
 # unique snippet name
-name: ALTRAN - BASIC SECURITY BASELINE
+name: BASIC SECURITY BASELINE
 # label used for menu selection
-label: ALTRAN
+label: LOG FORWARDING
 description: BASIC SECURITY BASELINE
 
 # type of device configuration
@@ -29,17 +29,8 @@ labels:
 variables:
   - name: hostname
     description: Firewall hostname
-    default: myFirewall
+    default: Firewall Name
     type_hint: text
-  - name: choices
-    description: sample dropdown list
-    default: choices
-    type_hint: dropdown
-    dd_list:
-      - key: option1
-        value: option1
-      - key: option2
-        value: option2
 # ---------------------------------------------------------------------
 # end of variables section
 
