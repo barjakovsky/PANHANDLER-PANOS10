@@ -31,6 +31,7 @@ snippets:
       # note here we can combine an advanced xpath query with 'capture_object'. This will capture
       # the full interface definition from the interface that contains the 'ip_to_find' value
       - name: interface_with_ip
+        capture_object: /config/devices/entry/network/interface/ethernet//entry/layer3/ip/entry[@name="{{ ip_to_find }}"]/../..
 
 - name: zones_are_configured
   cmd: validate
