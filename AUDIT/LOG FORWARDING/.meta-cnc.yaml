@@ -19,30 +19,20 @@ variables:
 
 snippets:
 
-  # test that all allow security policies have a profile or profile-group configured
-  - name: security_policy_test
+- name: parse config variable and capture outputs
     cmd: parse
     variable: config
     outputs:
-      # get a list of security policies with a profile or group configured
-      - name: security_policies_with_profile_or_group
-        capture_list: |-
-          /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
-          /rulebase/security/rules/entry/log-forwardingx/../@name
+      # create a variable named 'zone_names' which will be a list of the attribute 'names' from each zone
+      # note the use of '//' in the capture_pattern to select all zones
+      # the '@name' will return only the value of the attribute 'name' from each 'entry'
+      - name: zone_names
+        capture_pattern: /config/devices/entry/vsys/entry/zone//entry/@name
+      # note here we can combine an advanced xpath query with 'capture_object'. This will capture
+      # the full interface definition from the interface that contains the 'ip_to_find' value
+      - name: interface_with_ip
 
-      # get a list of security policies with action allow
-      - name: allow_security_policies_without_profile
-        capture_list: |-
-          /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
-          /rulebase/security/rules/entry/log-forwardingx[text()='PANORAMA']/../@name
-        filter_items: item not in security_policies_with_profile_or_group
-
-  # check that all allow security policies have a profile or group
-  - name: check_allow_security_policies_have_profile
-    label: check that all allow security policies have a profile or group
-    test: allow_security_policies_without_profile | length == 0
-    severity: medium
-    fail_message: |
-      allow security policies without a profile or group: {{ allow_security_policies_without_profile }}
-    pass_message: |
-      all allow security policies have a profile or group configured
+- name: zones_are_configured
+  cmd: validate
+  label: Ensure at least one zone is Configured
+  test: zone_names is not none
