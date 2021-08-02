@@ -28,7 +28,7 @@ snippets:
       - name: security_policies_with_profile_or_group
         capture_list: |-
           /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']
-          /rulebase/security/rules/entry/profile-setting/../@name
+          /rulebase/security/rules/entry/log-forwarding/../@name
 
       # get a list of security policies with action allow
       - name: allow_security_policies_without_profile
